@@ -349,8 +349,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		/// <summary>
 		///		Reemplaza una cadena teniendo en cuenta el tipo de comparación
 		/// </summary>
-		public static string ReplaceWithStringComparison(this string source, string search, string replace,
-														 StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
+		public static string ReplaceWithStringComparison(this string source, string search, string replace, StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
 		{
 			// Recorre la cadena sustituyendo los valores
 			if (!source.IsEmpty() && !search.EqualsIgnoreCase(replace))
@@ -443,30 +442,14 @@ namespace Bau.Libraries.LibHelper.Extensors
 		}
 
 		/// <summary>
-		///		Concatena una serie de líneas
-		/// </summary>
-		public static string Concatenate(this string value, List<string> sources, string separator = "\r\n", bool withSpace = false)
-		{
-			string result = "";
-
-				// Concatena las cadenas
-				if (sources != null)
-					foreach (string source in sources)
-						result = result.AddWithSeparator(source, separator, withSpace);
-				// Devuelve el resultado
-				return result;
-		}
-
-		/// <summary>
 		///		Separa una serie de cadenas
 		/// </summary>
 		public static List<string> SplitToList(this string value, string separator = "\r\n", bool addEmpty = false)
 		{
 			List<string> results = new List<string>();
-			List<string> sources = value.SplitByString(separator);
 
 				// Añade las cadenas
-				foreach (string source in sources)
+				foreach (string source in value.SplitByString(separator))
 					if (addEmpty || (!addEmpty && !source.TrimIgnoreNull().IsEmpty()))
 						results.Add(source.TrimIgnoreNull());
 				// Devuelve las cadenas
@@ -505,13 +488,10 @@ namespace Bau.Libraries.LibHelper.Extensors
 				if (!source.IsEmpty())
 					try
 					{
-						System.Text.RegularExpressions.Match match;
-
-							// Crea la expresión de búsqueda
-							match = System.Text.RegularExpressions.Regex.Match(source, start + "(.|\n)*?" + end,
-																			   System.Text.RegularExpressions.RegexOptions.IgnoreCase |
-																					System.Text.RegularExpressions.RegexOptions.CultureInvariant,
-																			   TimeSpan.FromSeconds(1));
+						System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(source, start + "(.|\n)*?" + end,
+																												System.Text.RegularExpressions.RegexOptions.IgnoreCase |
+																													System.Text.RegularExpressions.RegexOptions.CultureInvariant,
+																											    TimeSpan.FromSeconds(1));
 							// Mientras haya una coincidencia
 							while (match.Success)
 							{

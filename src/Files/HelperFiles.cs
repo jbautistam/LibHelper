@@ -107,7 +107,7 @@ namespace Bau.Libraries.LibHelper.Files
 			if (!string.IsNullOrEmpty(path))
 			{ 
 				DriveInfo [] drives = DriveInfo.GetDrives();
-						  
+
 					// Quita los espacios
 					path = NormalizeDrive(path.Trim());
 					// Comprueba si existe la unidad
@@ -232,7 +232,7 @@ namespace Bau.Libraries.LibHelper.Files
 			else
 				return true;
 		}
-		
+
 		/// <summary>
 		/// 	Carga un archivo de texto en una cadena
 		/// </summary>
@@ -260,7 +260,6 @@ namespace Bau.Libraries.LibHelper.Files
 				using (FileStream file = new FileStream(fileName, FileMode.Open, FileAccess.Read))
 				{ 
 					file.Read(buffer, 0, 5);
-					file.Close();
 				}
 				// Obtiene la codificación a partir de los bytes iniciales del archivo
 				if (buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF)
@@ -306,11 +305,6 @@ namespace Bau.Libraries.LibHelper.Files
 		/// <summary>
 		///		Graba un texto en un archivo con codificación UTF8 pero sin los caracteres iniciales de BOM. 
 		/// </summary>
-		/// <remarks>
-		///		Databricks no reconoce en los notebook los archivos de texto UTF8 que se graban con los caracteres iniciales
-		///	que indican que el archivo es UTF8, por eso se tiene que indicar en la codificación que se omitan estos caracteres
-		///	<see cref="https://stackoverflow.com/questions/2502990/create-text-file-without-bom"/>
-		/// </remarks>
 		public static void SaveTextFileWithoutBom(string fileName, string content)
 		{
 			SaveTextFile(fileName, content, new System.Text.UTF8Encoding(false));
@@ -323,10 +317,7 @@ namespace Bau.Libraries.LibHelper.Files
 		{ 
 			using (FileStream output = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write, FileShare.None))
 			{ 
-				// Escribe los bytes en el stream
 				output.Write(source, 0, source.Length);
-				// Cierra el stream de salida
-				output.Close();
 			}
 		}
 
@@ -538,8 +529,7 @@ namespace Bau.Libraries.LibHelper.Files
 		{ 
 			string newFile = Path.GetFileName(fileName);
 			string extension = NormalizeExtension(Path.GetExtension(fileName));
-			SortedDictionary<string, string> dctFiles = GetDictionaryFilesName(path, 
-																			   Path.GetFileNameWithoutExtension(newFile) + "*" + extension);
+			SortedDictionary<string, string> dctFiles = GetDictionaryFilesName(path, Path.GetFileNameWithoutExtension(newFile) + "*" + extension);
 			int index = 1;
 		
 				// Si existe el archivo destino, lo cambia
@@ -684,7 +674,7 @@ namespace Bau.Libraries.LibHelper.Files
 		}
 		
 		/// <summary>
-		/// Normaliza un nombre de archivo
+		///		Normaliza un nombre de archivo
 		/// </summary>
 		public static string Normalize(string fileName, int length, bool withAccents = true)
 		{ 
@@ -811,25 +801,25 @@ namespace Bau.Libraries.LibHelper.Files
 				else if (relativeFileName.IsEmpty())
 					target = path;
 				else
-					{ 
-						List<string> pathsSource = path.SplitToList("\\");
-						List<string> pathsRelative = relativeFileName.SplitToList("\\");
-						int endSource = pathsSource.Count;
-						int startTarget = 0;
+				{ 
+					List<string> pathsSource = path.SplitToList("\\");
+					List<string> pathsRelative = relativeFileName.SplitToList("\\");
+					int endSource = pathsSource.Count;
+					int startTarget = 0;
 
-							// Obtiene el índice final del directorio origen
-							while (startTarget < pathsRelative.Count && pathsRelative[startTarget] == "..")
-							{ 
-								endSource--;
-								startTarget++;
-							}
-							// Añade los directorios origen
-							for (int index = 0; index < endSource; index++)
-								target = target.AddWithSeparator(pathsSource[index], "\\", false);
-							// Añade los directorios destino
-							for (int index = startTarget; index < pathsRelative.Count; index++)
-								target = target.AddWithSeparator(pathsRelative[index], "\\", false);
-					}
+						// Obtiene el índice final del directorio origen
+						while (startTarget < pathsRelative.Count && pathsRelative[startTarget] == "..")
+						{ 
+							endSource--;
+							startTarget++;
+						}
+						// Añade los directorios origen
+						for (int index = 0; index < endSource; index++)
+							target = target.AddWithSeparator(pathsSource[index], "\\", false);
+						// Añade los directorios destino
+						for (int index = startTarget; index < pathsRelative.Count; index++)
+							target = target.AddWithSeparator(pathsRelative[index], "\\", false);
+				}
 				// Devuelve el directorio destino
 				return target;
 		}
@@ -855,28 +845,27 @@ namespace Bau.Libraries.LibHelper.Files
 		/// </summary>
 		public static string GetFileNameRelative(string path, string fileTarget)
 		{ 
-			return Path.Combine(GetPathRelative(path, Path.GetDirectoryName(fileTarget)),
-								Path.GetFileName(fileTarget));
+			return Path.Combine(GetPathRelative(path, Path.GetDirectoryName(fileTarget)), Path.GetFileName(fileTarget));
 		}
 
 		/// <summary>
 		///		Obtiene el directorio relativo
 		/// </summary>
-		public static string GetPathRelative(string pathource, string pathTarget)
+		public static string GetPathRelative(string pathSource, string pathTarget)
 		{ 
-			string [] pathsource = SplitPath(pathource);
-			string [] pathsTarget = SplitPath(pathTarget);
+			string [] partsPathSource = SplitPath(pathSource);
+			string [] partsPathTarget = SplitPath(pathTarget);
 			string url = "";
 			int index = 0, indexTarget;
-			
+
 				// Quita los directorios iniciales que sean iguales
-				while (index < pathsTarget.Length &&
-						index < pathsource.Length &&
-						pathsTarget[index].Equals(pathsource[index], StringComparison.CurrentCultureIgnoreCase))
+				while (index < partsPathTarget.Length &&
+						index < partsPathSource.Length &&
+						partsPathTarget[index].Equals(partsPathSource[index], StringComparison.CurrentCultureIgnoreCase))
 					index++;
 				// Añade todos los .. que sean necesarios
 				indexTarget = index;
-				while (indexTarget <= pathsource.Length - 1)
+				while (indexTarget <= partsPathSource.Length - 1)
 				{ 
 					// Añade el salto
 					url += "../";
@@ -884,12 +873,12 @@ namespace Bau.Libraries.LibHelper.Files
 					indexTarget++;
 				}
 				// Añade los archivos finales
-				while (index < pathsTarget.Length)
+				while (index < partsPathTarget.Length)
 				{ 
 					// Añade el directorio
-					url += pathsTarget[index];
+					url += partsPathTarget[index];
 					// Añade el separador
-					if (index < pathsTarget.Length - 1)
+					if (index < partsPathTarget.Length - 1)
 						url += "/";
 					// Incrementa el índice
 					index++;
