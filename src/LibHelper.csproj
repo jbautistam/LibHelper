@@ -13,9 +13,10 @@
 		<RepositoryUrl>https://github.com/jbautistam/LibHelper</RepositoryUrl>
 		<RepositoryType>GitHub</RepositoryType>
 		<PackageTags>helper, extensors</PackageTags>
-		<AssemblyVersion>1.0.0.2</AssemblyVersion>
-		<FileVersion>1.0.0.2</FileVersion>
-		<Version>1.0.2</Version>
+		<AssemblyVersion>1.0.3.0</AssemblyVersion>
+		<FileVersion>1.0.3.0</FileVersion>
+		<Version>1.0.3</Version>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
