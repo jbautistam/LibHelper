@@ -9,7 +9,7 @@
 		<Authors>Jose Antonio Bautista Montejo</Authors>
 		<Description>Extensors and helper functions</Description>
 		<Copyright>Creative Commons</Copyright>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<RepositoryUrl>https://github.com/jbautistam/LibHelper</RepositoryUrl>
 		<RepositoryType>GitHub</RepositoryType>
 		<PackageTags>helper, extensors</PackageTags>
