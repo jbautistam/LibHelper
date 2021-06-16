@@ -17,14 +17,18 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Build
-      run: dotnet build --no-restore      
+      run: dotnet build --no-restore    
+      
     - name: Pack
       run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID src/LibHelper.csproj
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
+
+    - name: Publish nuget Bau.Libraries.LibHelper
+      uses: brandedoutcast/publish-nuget@v2.5.2
       with:
-        name: nupkg
-        path: ./src/bin/Release/*.nupkg
+          PROJECT_FILE_PATH: src/LibHelper.csproj
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
