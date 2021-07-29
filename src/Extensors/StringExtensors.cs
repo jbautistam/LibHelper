@@ -513,5 +513,31 @@ namespace Bau.Libraries.LibHelper.Extensors
 				// Devuelve las coincidencias
 				return results;
 		}
+
+		/// <summary>
+		///		Elimina una serie de caracteres de una cadena
+		/// </summary>
+		public static string Delete(this string source, int start, int length)
+		{
+			string target = "";
+
+				// Añade la cadena inicial
+				if (start > 0)
+				{
+					if (start == 1)
+						target = source.Substring(0, 1);
+					else
+						target = source.Substring(0, start - 1);
+				}
+				// Añade la cadena final
+				if (start + length < source.Length)
+				{
+					if (start > 0)
+						start--;
+					target += source.Substring(start + length);
+				}
+				// Devuelve la cadena
+				return target;
+		}
 	}
 }
