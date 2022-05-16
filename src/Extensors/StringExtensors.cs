@@ -67,7 +67,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		public static string ToUpperFirstLetter(this string value)
 		{
 			if (value.IsEmpty())
-				return "";
+				return string.Empty;
 			else
 				return value.Left(1).ToUpper() + value.From(1);
 		}
@@ -88,7 +88,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 			if (!IsEmpty(value))
 				return value.Trim();
 			else
-				return "";
+				return string.Empty;
 		}
 
 		/// <summary>
@@ -236,9 +236,9 @@ namespace Bau.Libraries.LibHelper.Extensors
 			if (!string.IsNullOrWhiteSpace(add))
 			{
 				if (!value.IsEmpty())
-					value += separator + (withSpace ? " " : "");
+					value += separator + (withSpace ? " " : string.Empty);
 				else // ... evita los posibles errores si la cadena es NULL
-					value = "";
+					value = string.Empty;
 			}
 			// Devuelve la cadena con el valor añadido
 			return value + add;
@@ -251,10 +251,10 @@ namespace Bau.Libraries.LibHelper.Extensors
 		public static string Cut(this string source, string separator, out string target)
 		{
 			int index;
-			string cut = "";
+			string cut = string.Empty;
 
 				// Inicializa los valores de salida
-				target = "";
+				target = string.Empty;
 				// Si hay algo que cortar ...
 				if (!source.IsEmpty())
 				{ 
@@ -269,7 +269,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 					if ((cut + separator).Length - 1 < source.Length)
 						target = source.Substring((cut + separator).Length);
 					else
-						target = "";
+						target = string.Empty;
 				}
 				// Devuelve la primera parte de la cadena
 				return cut;
@@ -285,7 +285,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		public static string Cut(this string source, int length, out string last)
 		{ 
 			// Inicializa la cadena de salida
-			last = "";
+			last = string.Empty;
 			// Corta la cadena
 			if (!source.IsEmpty() && source.Length > length)
 			{
@@ -328,7 +328,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 			if (source.IsEmpty() || !source.StartsWith(start, StringComparison.CurrentCultureIgnoreCase))
 				return source;
 			else if (source.Length == start.Length)
-				return "";
+				return string.Empty;
 			else
 				return source.Substring(start.Length);
 		}
@@ -341,7 +341,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 			if (source.IsEmpty() || !source.EndsWith(end, StringComparison.CurrentCultureIgnoreCase))
 				return source;
 			else if (source.Length == end.Length)
-				return "";
+				return string.Empty;
 			else
 				return source.Substring(0, source.Length - end.Length);
 		}
@@ -381,7 +381,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		public static string Left(this string source, int length)
 		{
 			if (IsEmpty(source) || length <= 0)
-				return "";
+				return string.Empty;
 			else if (length > source.Length)
 				return source;
 			else
@@ -394,7 +394,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		public static string Right(this string source, int length)
 		{
 			if (IsEmpty(source) || length <= 0)
-				return "";
+				return string.Empty;
 			else if (length > source.Length)
 				return source;
 			else
@@ -407,7 +407,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		public static string From(this string source, int first)
 		{
 			if (IsEmpty(source) || first >= source.Length)
-				return "";
+				return string.Empty;
 			else if (first <= 0)
 				return source;
 			else
@@ -427,7 +427,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		/// </summary>
 		public static string ToUnicode(this string value)
 		{
-			string result = "";
+			string result = string.Empty;
 
 				// Codifica los caracteres
 				foreach (char letter in value)
@@ -464,7 +464,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 			const string withAccents = "ÁÉÍÓÚáéíóúÀÈÌÒÙàèìòùÄËÏÖÜäëïöü";
 			const string withOutAccents = "AEIOUaeiouAEIOUaeiouAEIOUaeiou";
 			int index;
-			string result = "";
+			string result = string.Empty;
 
 				// Normaliza la cadena
 				if (!value.IsEmpty())
@@ -519,7 +519,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		/// </summary>
 		public static string Delete(this string source, int start, int length)
 		{
-			string target = "";
+			string target = string.Empty;
 
 				// Añade la cadena inicial
 				if (start > 0)
