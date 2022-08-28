@@ -32,11 +32,16 @@ jobs:
       - uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0.x'
-          source-url: https://nuget.pkg.github.com/jbautistam/index.json
+          source-url: https://api.nuget.org/v3/index.json
         env:
-          NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
-      - run: dotnet build --configuration Release src/LibHelper.csproj
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_TOKEN}}
+
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release src/LibHelper.csproj
       - name: Create the package
         run: dotnet pack --configuration Release src/LibHelper.csproj
-      - name: Publish the package to GPR
-        run: dotnet nuget push src/bin/Release/*.nupkg
+
+      - name: Publish the package to Nuget
+        run: dotnet nuget push src/bin/Release/*.nupkg --skip-duplicate --no-symbols true --api-key ${{secrets.NUGET_TOKEN}}
