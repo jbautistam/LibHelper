@@ -31,4 +31,4 @@ jobs:
         run: dotnet pack --configuration Release src/LibHelper.csproj -p:PackageVersion=1.1.$GITHUB_RUN_NUMBER
 
       - name: Publish the package to Nuget
-        run: dotnet nuget push src/bin/Release/*.nupkg --no-symbols true --api-key ${{secrets.NUGET_TOKEN}}
+        run: dotnet nuget push src/bin/Release/*.nupkg --no-symbols --api-key ${{secrets.NUGET_TOKEN}}
