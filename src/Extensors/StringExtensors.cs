@@ -480,7 +480,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		/// <summary>
 		///		Extrae las cadenas que se corresponden con un patrón
 		/// </summary>
-		public static List<string> Extract(this string source, string start, string end)
+		public static List<string> Extract(this string source, string start, string end, bool trimResults = true)
 		{
 			List<string> results = new List<string>();
 
@@ -501,7 +501,10 @@ namespace Bau.Libraries.LibHelper.Extensors
 									value = value.RemoveStart(start);
 									value = value.RemoveEnd(end);
 									// Añade la cadena encontrada
-									results.Add(value.TrimIgnoreNull());
+									if (trimResults)
+										results.Add(value.TrimIgnoreNull());
+									else
+										results.Add(value);
 									// Pasa a la siguiente coincidencia
 									match = match.NextMatch();
 							}
