@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Threading;
 
 using Bau.Libraries.LibHelper.Extensors;
 
@@ -473,20 +474,25 @@ namespace Bau.Libraries.LibHelper.Files
 		/// <summary>
 		///		Copia un directorio en otro de forma asíncrona
 		/// </summary>
-		public async static Task CopyPathAsync(string sourcePath, string targetPath, string mask = null, bool recursive = true, bool flatPaths = false)
+		public async static Task CopyPathAsync(string sourcePath, string targetPath, string mask = null, bool recursive = true, bool flatPaths = false,
+											   CancellationToken cancellationToken = default)
 		{ 
 			// Crea el directorio destino
 			MakePath(targetPath);
 			// Copia los archivos del directorio origen en el destino
 			foreach (string fileName in Directory.GetFiles(sourcePath, mask ?? "*.*"))
-				await CopyFileAsync(fileName, Path.Combine(targetPath, Path.GetFileName(fileName)));
+				if (!cancellationToken.IsCancellationRequested)
+					await CopyFileAsync(fileName, Path.Combine(targetPath, Path.GetFileName(fileName)));
 			// Copia los directorios
 			if (recursive)
 				foreach (string path in Directory.GetDirectories(sourcePath))
-					if (flatPaths)
-						await CopyPathAsync(path, targetPath, mask, flatPaths);
-					else
-						await CopyPathAsync(path, Path.Combine(targetPath, Path.GetFileName(path)), mask, flatPaths);
+					if (!cancellationToken.IsCancellationRequested)
+					{
+						if (flatPaths)
+							await CopyPathAsync(path, targetPath, mask, flatPaths, cancellationToken: cancellationToken);
+						else
+							await CopyPathAsync(path, Path.Combine(targetPath, Path.GetFileName(path)), mask, flatPaths, cancellationToken: cancellationToken);
+					}
 		}
 
 		/// <summary>
