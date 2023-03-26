@@ -210,7 +210,8 @@ namespace Bau.Libraries.LibHelper.Files
 		/// </summary>
 		public static bool KillPath(string path)
 		{ 
-			if (Directory.Exists(path))
+			// Si realmente tenemos algo que borrar
+			if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
 			{	
 				// Elimina los archivos
 				foreach (string file in Directory.GetFiles(path))
@@ -223,15 +224,14 @@ namespace Bau.Libraries.LibHelper.Files
 				try
 				{ 
 					Directory.Delete(path);
-					return true;
 				}
 				catch 
 				{ 
 					return false; 
 				}
 			}
-			else
-				return true;
+			// Indica que se ha borrado correctamente
+			return true;
 		}
 
 		/// <summary>
