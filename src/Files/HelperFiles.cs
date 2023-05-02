@@ -706,7 +706,7 @@ namespace Bau.Libraries.LibHelper.Files
 					while (target.Length > 0 && target[0] == '.')
 						target = target.Substring(1);
 					// Obtiene los n primeros caracteres del nombre de archivo
-					if (length > 0 && target.Length >	length)
+					if (length > 0 && target.Length > length)
 						target = target.Substring(0, length);
 				}
 				// Devuelve la cadena de salida
