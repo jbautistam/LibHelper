@@ -403,10 +403,9 @@ namespace Bau.Libraries.LibHelper.Files
 			{ 
 				// Crea el directorio destino
 				MakePath(pathTarget);
-				// Copia el directorio origen en el destino
-				CopyPath(pathSource, pathTarget);
-				// Borra los archivos (si se han copiado)
-				KillComparePath(pathSource, pathTarget);
+				// Copia el directorio origen en el destino y elimina el original si se ha copiado
+				if (CopyPath(pathSource, pathTarget))
+					KillPath(pathSource);
 				// Indica que se ha movido correctamente
 				return true;
 			}
@@ -455,26 +454,40 @@ namespace Bau.Libraries.LibHelper.Files
 		/// <summary>
 		///		Copia un directorio en otro
 		/// </summary>
-		public static void CopyPath(string sourcePath, string targetPath, string mask = null, bool recursive = true, bool flatPaths = false)
+		public static bool CopyPath(string sourcePath, string targetPath, string? mask = null, bool recursive = true, bool flatPaths = false)
 		{ 
-			// Crea el directorio destino
-			MakePath(targetPath);
-			// Copia los archivos del directorio origen en el destino
-			foreach (string fileName in Directory.GetFiles(sourcePath, mask ?? "*.*"))
-				CopyFile(fileName, Path.Combine(targetPath, Path.GetFileName(fileName)));
-			// Copia los directorios
-			if (recursive)
-				foreach (string path in Directory.GetDirectories(sourcePath))
-					if (flatPaths)
-						CopyPath(path, targetPath, mask, flatPaths);
-					else
-						CopyPath(path, Path.Combine(targetPath, Path.GetFileName(path)), mask, flatPaths);
+			bool copied = false;
+
+				// Copia los directorios
+				try
+				{
+					// Crea el directorio destino
+					MakePath(targetPath);
+					// Copia los archivos del directorio origen en el destino
+					foreach (string fileName in Directory.GetFiles(sourcePath, mask ?? "*.*"))
+						CopyFile(fileName, Path.Combine(targetPath, Path.GetFileName(fileName)));
+					// Copia los directorios
+					if (recursive)
+						foreach (string path in Directory.GetDirectories(sourcePath))
+							if (flatPaths)
+								CopyPath(path, targetPath, mask, flatPaths);
+							else
+								CopyPath(path, Path.Combine(targetPath, Path.GetFileName(path)), mask, flatPaths);
+					// Indica que se ha copiado
+					copied = true;
+				}
+				catch (Exception exception)
+				{
+					System.Diagnostics.Trace.TraceError($"Error when copy path '{sourcePath}' to '{targetPath}'. {exception.Message}");
+				}
+				// Devuelve el valor que indica si se ha copiado
+				return copied;
 		}
 
 		/// <summary>
 		///		Copia un directorio en otro de forma asíncrona
 		/// </summary>
-		public async static Task CopyPathAsync(string sourcePath, string targetPath, string mask = null, bool recursive = true, bool flatPaths = false,
+		public async static Task CopyPathAsync(string sourcePath, string targetPath, string? mask = null, bool recursive = true, bool flatPaths = false,
 											   CancellationToken cancellationToken = default)
 		{ 
 			// Crea el directorio destino
