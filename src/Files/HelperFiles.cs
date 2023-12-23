@@ -398,21 +398,22 @@ namespace Bau.Libraries.LibHelper.Files
 		///		Mueve un directorio
 		/// </summary>
 		public static bool MovePath(string pathSource, string pathTarget)
-		{ 
-			try
-			{ 
-				// Crea el directorio destino
-				MakePath(pathTarget);
-				// Copia el directorio origen en el destino y elimina el original si se ha copiado
-				if (CopyPath(pathSource, pathTarget))
-					KillPath(pathSource);
-				// Indica que se ha movido correctamente
-				return true;
-			}
-			catch
-			{	
-				return false;
-			}
+		{
+			if (!string.IsNullOrWhiteSpace(pathSource) && !string.IsNullOrWhiteSpace(pathTarget) &&
+					!pathSource.Equals(pathTarget, StringComparison.CurrentCultureIgnoreCase))
+				try
+				{ 
+					// Crea el directorio destino
+					MakePath(pathTarget);
+					// Copia el directorio origen en el destino y elimina el original si se ha copiado
+					if (CopyPath(pathSource, pathTarget))
+						KillPath(pathSource);
+					// Indica que se ha movido correctamente
+					return true;
+				}
+				catch {	}
+			// Si ha llegado hasta aquí es porque no se ha podido mover
+			return false;
 		}
 
 		/// <summary>
@@ -459,27 +460,29 @@ namespace Bau.Libraries.LibHelper.Files
 			bool copied = false;
 
 				// Copia los directorios
-				try
-				{
-					// Crea el directorio destino
-					MakePath(targetPath);
-					// Copia los archivos del directorio origen en el destino
-					foreach (string fileName in Directory.GetFiles(sourcePath, mask ?? "*.*"))
-						CopyFile(fileName, Path.Combine(targetPath, Path.GetFileName(fileName)));
-					// Copia los directorios
-					if (recursive)
-						foreach (string path in Directory.GetDirectories(sourcePath))
-							if (flatPaths)
-								CopyPath(path, targetPath, mask, flatPaths);
-							else
-								CopyPath(path, Path.Combine(targetPath, Path.GetFileName(path)), mask, flatPaths);
-					// Indica que se ha copiado
-					copied = true;
-				}
-				catch (Exception exception)
-				{
-					System.Diagnostics.Trace.TraceError($"Error when copy path '{sourcePath}' to '{targetPath}'. {exception.Message}");
-				}
+				if (!string.IsNullOrWhiteSpace(sourcePath) && !string.IsNullOrWhiteSpace(targetPath) &&
+						!sourcePath.Equals(targetPath, StringComparison.CurrentCultureIgnoreCase))
+					try
+					{
+						// Crea el directorio destino
+						MakePath(targetPath);
+						// Copia los archivos del directorio origen en el destino
+						foreach (string fileName in Directory.GetFiles(sourcePath, mask ?? "*.*"))
+							CopyFile(fileName, Path.Combine(targetPath, Path.GetFileName(fileName)));
+						// Copia los directorios
+						if (recursive)
+							foreach (string path in Directory.GetDirectories(sourcePath))
+								if (flatPaths)
+									CopyPath(path, targetPath, mask, flatPaths);
+								else
+									CopyPath(path, Path.Combine(targetPath, Path.GetFileName(path)), mask, flatPaths);
+						// Indica que se ha copiado
+						copied = true;
+					}
+					catch (Exception exception)
+					{
+						System.Diagnostics.Trace.TraceError($"Error when copy path '{sourcePath}' to '{targetPath}'. {exception.Message}");
+					}
 				// Devuelve el valor que indica si se ha copiado
 				return copied;
 		}
@@ -506,7 +509,7 @@ namespace Bau.Libraries.LibHelper.Files
 						else
 							await CopyPathAsync(path, Path.Combine(targetPath, Path.GetFileName(path)), mask, flatPaths, cancellationToken: cancellationToken);
 					}
-		}
+	}
 
 		/// <summary>
 		///		Crea un directorio consecutivo, es decir, si existe ya el nombre del directorio crea
@@ -623,6 +626,10 @@ namespace Bau.Libraries.LibHelper.Files
 				{ 
 					// Añade al diccionario los nombres de archivos en mayúsculas
 					foreach (string file in Directory.GetFiles(path, mask))
+						if (!string.IsNullOrEmpty(file) && !filesSorted.ContainsKey(Path.GetFileName(file).ToUpper()))
+							filesSorted.Add(Path.GetFileName(file).ToUpper(), file.ToUpper());
+					// Añade al diccionario los nombres de directorios en mayúsculas
+					foreach (string file in Directory.GetDirectories(path))
 						if (!string.IsNullOrEmpty(file) && !filesSorted.ContainsKey(Path.GetFileName(file).ToUpper()))
 							filesSorted.Add(Path.GetFileName(file).ToUpper(), file.ToUpper());
 				}

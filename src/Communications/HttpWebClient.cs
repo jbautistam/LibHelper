@@ -61,22 +61,15 @@ namespace Bau.Libraries.LibHelper.Communications
 		/// </summary>
 		public async Task DownloadFileAsync(string uri, string fileName)
 		{
-			try
-			{
-				using (HttpClient client = GetHttpClient())
-					using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri))
-						using (System.IO.Stream responseStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync())
-							using (System.IO.FileStream fileStream = new System.IO.FileStream(fileName, System.IO.FileMode.Create, 
-																							  System.IO.FileAccess.Write, 
-																							  System.IO.FileShare.None, 2000, true))
-							{
-								await responseStream.CopyToAsync(fileStream);
-							}
-			}
-			catch (Exception exception)
-			{
-				System.Diagnostics.Debug.WriteLine($"Excepción cuando se descarga el archivo {exception.Message}");
-			}
+			using (HttpClient client = GetHttpClient())
+				using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri))
+					using (System.IO.Stream responseStream = await (await client.SendAsync(request)).Content.ReadAsStreamAsync())
+						using (System.IO.FileStream fileStream = new System.IO.FileStream(fileName, System.IO.FileMode.Create, 
+																							System.IO.FileAccess.Write, 
+																							System.IO.FileShare.None, 2000, true))
+						{
+							await responseStream.CopyToAsync(fileStream);
+						}
 		}
 
 		/// <summary>
