@@ -171,7 +171,6 @@ namespace Bau.Libraries.LibHelper.Files
 		}
 
 		/// <summary>
-		/// 
 		///		Crea un directorio sin tener en cuenta las excepciones
 		/// </summary>
 		public static bool MakePath(string path, out string error)
@@ -455,7 +454,7 @@ namespace Bau.Libraries.LibHelper.Files
 		/// <summary>
 		///		Copia un directorio en otro
 		/// </summary>
-		public static bool CopyPath(string sourcePath, string targetPath, string? mask = null, bool recursive = true, bool flatPaths = false)
+		public static bool CopyPath(string sourcePath, string targetPath)
 		{ 
 			bool copied = false;
 
@@ -467,15 +466,11 @@ namespace Bau.Libraries.LibHelper.Files
 						// Crea el directorio destino
 						MakePath(targetPath);
 						// Copia los archivos del directorio origen en el destino
-						foreach (string fileName in Directory.GetFiles(sourcePath, mask ?? "*.*"))
+						foreach (string fileName in Directory.GetFiles(sourcePath))
 							CopyFile(fileName, Path.Combine(targetPath, Path.GetFileName(fileName)));
 						// Copia los directorios
-						if (recursive)
-							foreach (string path in Directory.GetDirectories(sourcePath))
-								if (flatPaths)
-									CopyPath(path, targetPath, mask, flatPaths);
-								else
-									CopyPath(path, Path.Combine(targetPath, Path.GetFileName(path)), mask, flatPaths);
+						foreach (string path in Directory.GetDirectories(sourcePath))
+							CopyPath(path, Path.Combine(targetPath, Path.GetFileName(path)));
 						// Indica que se ha copiado
 						copied = true;
 					}
@@ -490,26 +485,19 @@ namespace Bau.Libraries.LibHelper.Files
 		/// <summary>
 		///		Copia un directorio en otro de forma asíncrona
 		/// </summary>
-		public async static Task CopyPathAsync(string sourcePath, string targetPath, string? mask = null, bool recursive = true, bool flatPaths = false,
-											   CancellationToken cancellationToken = default)
+		public async static Task CopyPathAsync(string sourcePath, string targetPath, CancellationToken cancellationToken = default)
 		{ 
 			// Crea el directorio destino
 			MakePath(targetPath);
 			// Copia los archivos del directorio origen en el destino
-			foreach (string fileName in Directory.GetFiles(sourcePath, mask ?? "*.*"))
+			foreach (string fileName in Directory.GetFiles(sourcePath, "*.*"))
 				if (!cancellationToken.IsCancellationRequested)
 					await CopyFileAsync(fileName, Path.Combine(targetPath, Path.GetFileName(fileName)));
 			// Copia los directorios
-			if (recursive)
-				foreach (string path in Directory.GetDirectories(sourcePath))
-					if (!cancellationToken.IsCancellationRequested)
-					{
-						if (flatPaths)
-							await CopyPathAsync(path, targetPath, mask, flatPaths, cancellationToken: cancellationToken);
-						else
-							await CopyPathAsync(path, Path.Combine(targetPath, Path.GetFileName(path)), mask, flatPaths, cancellationToken: cancellationToken);
-					}
-	}
+			foreach (string path in Directory.GetDirectories(sourcePath))
+				if (!cancellationToken.IsCancellationRequested)
+					await CopyPathAsync(path, Path.Combine(targetPath, Path.GetFileName(path)), cancellationToken: cancellationToken);
+		}
 
 		/// <summary>
 		///		Crea un directorio consecutivo, es decir, si existe ya el nombre del directorio crea
