@@ -187,7 +187,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		/// <summary>
 		///		Convierte la fecha y hora de una cadena utilizando un formato estricto
 		/// </summary>
-		public static DateTime? GetDateTime(this string value, string format, System.Globalization.DateTimeStyles style = System.Globalization.DateTimeStyles.AssumeUniversal)
+		public static DateTime? GetDateTime(this string value, string format, System.Globalization.DateTimeStyles style = System.Globalization.DateTimeStyles.None)
 		{
 			if (DateTime.TryParseExact(value, format, System.Globalization.CultureInfo.InvariantCulture.DateTimeFormat, style, out DateTime result))
 				return result;
@@ -199,7 +199,7 @@ namespace Bau.Libraries.LibHelper.Extensors
 		///		Convierte la fecha y hora de una cadena con un formato estricto
 		/// </summary>
 		public static DateTime GetDateTime(this string value, string format, DateTime defaultValue, 
-										   System.Globalization.DateTimeStyles style = System.Globalization.DateTimeStyles.AssumeUniversal)
+										   System.Globalization.DateTimeStyles style = System.Globalization.DateTimeStyles.None)
 		{
 			return GetDateTime(value, format, style) ?? defaultValue;
 		}
