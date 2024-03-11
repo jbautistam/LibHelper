@@ -218,12 +218,12 @@ namespace Bau.Libraries.LibHelper.Extensors
 		/// <summary>
 		///		Obtiene una Url a partir de una cadena
 		/// </summary>
-		public static Uri GetUrl(this string url, Uri uriDefault = null)
+		public static Uri? GetUrl(this string url, Uri? uriDefault = null)
 		{
 			// Convierte la Url
-			if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out Uri uri))
+			if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out Uri? uri))
 				uri = uriDefault;
-			// Devuelv la Url
+			// Devuelve la Url
 			return uri;
 		}
 
