@@ -3,7 +3,8 @@
 
 	<PropertyGroup>
 		<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-		<TargetFramework>netstandard2.1</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Bau.Libraries.$(MSBuildProjectName)</RootNamespace>
 		<PackageId>Bau.Libraries.LibHelper</PackageId>
 		<Authors>Jose Antonio Bautista Montejo</Authors>
