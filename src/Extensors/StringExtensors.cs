@@ -236,7 +236,7 @@ public static class StringExtensor
 	/// <summary>
 	///		Obtiene una Url a partir de una cadena
 	/// </summary>
-	public static Uri? GetUrl(this string url, Uri? uriDefault = null)
+	public static Uri? GetUrl(this string? url, Uri? uriDefault = null)
 	{
 		// Convierte la Url
 		if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out Uri? uri))
