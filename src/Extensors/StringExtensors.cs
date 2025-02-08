@@ -248,7 +248,7 @@ public static class StringExtensor
 	/// <summary>
 	///		Añade una cadena a otra con un separador si es necesario
 	/// </summary>
-	public static string AddWithSeparator(this string value, string add, string separator, bool withSpace = true)
+	public static string AddWithSeparator(this string value, string? add, string separator, bool withSpace = true)
 	{ 
 		// Añade el separador (si hay algo que añadir)
 		if (!string.IsNullOrWhiteSpace(add))
