@@ -248,14 +248,14 @@ public static class StringExtensor
 	/// <summary>
 	///		Añade una cadena a otra con un separador si es necesario
 	/// </summary>
-	public static string AddWithSeparator(this string value, string? add, string separator, bool withSpace = true)
+	public static string AddWithSeparator(this string? value, string? add, string separator, bool withSpace = true)
 	{ 
 		// Añade el separador (si hay algo que añadir)
 		if (!string.IsNullOrWhiteSpace(add))
 		{
-			if (!value.IsEmpty())
+			if (!string.IsNullOrWhiteSpace(value))
 				value += separator + (withSpace ? " " : string.Empty);
-			else // ... evita los posibles errores si la cadena es NULL
+			else // ... si la cadena es nula la vacía y evita los errores de añadir a una cadena nula
 				value = string.Empty;
 		}
 		// Devuelve la cadena con el valor añadido
@@ -266,7 +266,7 @@ public static class StringExtensor
 	///		Corta una cadena hasta un separador. Devuelve la parte inicial de la cadena antes del separador
 	///	y deja en la cadena target, a partir del separador
 	/// </summary>
-	public static string Cut(this string source, string separator, out string target)
+	public static string Cut(this string? source, string separator, out string target)
 	{
 		int index;
 		string cut = string.Empty;
@@ -274,7 +274,7 @@ public static class StringExtensor
 			// Inicializa los valores de salida
 			target = string.Empty;
 			// Si hay algo que cortar ...
-			if (!source.IsEmpty())
+			if (!string.IsNullOrWhiteSpace(source))
 			{ 
 				// Obtiene el índice donde se encuentra el separador
 				index = source.IndexOf(separator, StringComparison.CurrentCultureIgnoreCase);
