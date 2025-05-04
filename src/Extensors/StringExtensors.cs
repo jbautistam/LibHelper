@@ -8,7 +8,7 @@ public static class StringExtensor
 	/// <summary>
 	///		Comprueba si dos cadenas son iguales sin tener en cuenta las mayúsculas y tratando los nulos
 	/// </summary>
-	public static bool EqualsIgnoreCase(this string first, string second)
+	public static bool EqualsIgnoreCase(this string? first, string second)
 	{
 		if (string.IsNullOrEmpty(first) && !string.IsNullOrEmpty(second))
 			return false;
@@ -23,7 +23,7 @@ public static class StringExtensor
 	/// <summary>
 	///		Comprueba si dos cadenas son iguales sin tener en cuenta los nulos
 	/// </summary>
-	public static bool EqualsIgnoreNull(this string first, string second)
+	public static bool EqualsIgnoreNull(this string? first, string second)
 	{
 		if (string.IsNullOrEmpty(first) && !string.IsNullOrEmpty(second))
 			return false;
@@ -32,13 +32,13 @@ public static class StringExtensor
 		else if (string.IsNullOrEmpty(first) && string.IsNullOrEmpty(second))
 			return true;
 		else
-			return first.Equals(second, StringComparison.CurrentCulture);
+			return first.Equals(second, StringComparison.CurrentCultureIgnoreCase);
 	}
 
 	/// <summary>
 	///		Compara dos valores 
 	/// </summary>
-	public static int CompareIgnoreNullTo(this string first, string second)
+	public static int CompareIgnoreNullTo(this string? first, string second)
 	{
 		if (string.IsNullOrEmpty(first) && string.IsNullOrEmpty(second))
 			return 0;
