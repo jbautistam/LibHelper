@@ -5,13 +5,10 @@ on:
   workflow_dispatch: # Allow running the workflow manually from the GitHub UI
   push:
     branches:
-      - 'main'       # Run the workflow when pushing to the main branch
+      - 'master'       # Run the workflow when pushing to the main branch
   pull_request:
     branches:
       - '*'          # Run the workflow for all pull requests
-  release:
-    types:
-      - published    # Run the workflow when a new GitHub release is published
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
@@ -23,6 +20,15 @@ defaults:
     shell: pwsh
 
 jobs:
+  set_version_number:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set version number
+      run: |
+            $version = "1.0."+(1000+$($Env:GITHUB_RUN_NUMBER))+".0"
+            echo $version
+            echo "VERSION_NUMBER=$version" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+
   run_test:
     runs-on: ubuntu-latest
     steps:
@@ -34,7 +40,7 @@ jobs:
 
   create_nuget:
     runs-on: ubuntu-latest
-    needs: [ run_test ]
+    needs: [ run_test, set_version_number ]
     steps:
     - uses: actions/checkout@v3
       with:
@@ -45,7 +51,7 @@ jobs:
       uses: actions/setup-dotnet@v4
 
     # Create the NuGet package in the folder from the environment variable NuGetDirectory
-    - run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }} -p:PackageVersion=1.1.$GITHUB_RUN_NUMBER
+    - run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }} -p:PackageVersion=${{ env.VERSION_NUMBER }}
 
     # Publish the NuGet package as an artifact, so they can be used in the following jobs
     - uses: actions/upload-artifact@v4
