@@ -25,9 +25,9 @@ jobs:
     steps:
     - name: Set version number
       run: |
-            $version = "1.0."+(1000+$($Env:GITHUB_RUN_NUMBER))+".0"
+            $version = "1.3."+(1000+$($Env:GITHUB_RUN_NUMBER))
             echo $version
-            echo "VERSION_NUMBER=$version" >> $GITHUB_ENV
+            echo "NUGET_VERSION_NUMBER=$version" >> $GITHUB_ENV
 
   run_test:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
       uses: actions/setup-dotnet@v4
 
     # Create the NuGet package in the folder from the environment variable NuGetDirectory
-    - run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }} --p:PackageVersion=${{ env.VERSION_NUMBER }}
+    - run: dotnet pack --configuration Release --output ${{ env.NuGetDirectory }} --p:PackageVersion=${{ env.NUGET_VERSION_NUMBER }}
 
     # Publish the NuGet package as an artifact, so they can be used in the following jobs
     - uses: actions/upload-artifact@v4
