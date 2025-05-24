@@ -18,18 +18,12 @@ public class HttpWebClient
 	/// <summary>
 	///		Obtiene el contenido de una URL
 	/// </summary>
-	public string HttpGet(string uri)
-	{
-		return HttpGetAsync(uri, CancellationToken.None).Result;
-	}
+	public string HttpGet(string uri) => HttpGetAsync(uri, CancellationToken.None).Result;
 
 	/// <summary>
 	///		Obtiene el contenido de una URL
 	/// </summary>
-	public Task<string> HttpGetAsync(string uri)
-	{
-		return HttpGetAsync(uri, CancellationToken.None);
-	}
+	public Task<string> HttpGetAsync(string uri) => HttpGetAsync(uri, CancellationToken.None);
 
 	/// <summary>
 	///		Obtiene el contenido de una URL
@@ -71,8 +65,8 @@ public class HttpWebClient
 	/// </summary>
 	private HttpClient GetHttpClient()
 	{
-		HttpClientHandler handler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip };
-		HttpClient client = new HttpClient(handler);
+		HttpClientHandler handler = new() { AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip };
+		HttpClient client = new(handler);
 
 			// Añade las cabeceras predeterminadas
 			client.DefaultRequestHeaders.Add("User-Agent", UserAgent);

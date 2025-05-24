@@ -10,39 +10,47 @@ public static class HelperFiles
 	/// <summary>
 	///		Elimina un archivo (no tiene en cuenta las excepciones)
 	/// </summary>
-	public static bool KillFile(string fileName)
+	public static bool KillFile(string fileName, bool useRecycleBin)
 	{	
-		// Quita el atributo de sólo lectura
-		//! Está en un try separado porque puede dar problemas de "Acceso denegado"
-		try
-		{ 
-			File.SetAttributes(fileName, FileAttributes.Normal);
-		}
-		catch {}
-		// Borra el archivo
-		try
-		{ 
-			// Elimina el archivo
-			File.Delete(fileName);
-			// Indica que se ha borrado correctamente
-			return true;
-		}
-		catch (Exception exception)
-		{ 
-			// Muestra el mensaje
-			System.Diagnostics.Debug.WriteLine(exception.Message);
-			// Indica que no se ha podido borrar
-			return false;
-		}
+		bool deleted = false;
+
+			// Quita el atributo de sólo lectura
+			//! Está en un try separado porque puede dar problemas de "Acceso denegado"
+			try
+			{ 
+				File.SetAttributes(fileName, FileAttributes.Normal);
+			}
+			catch {}
+			// Borra el archivo
+			try
+			{ 
+				// Elimina el archivo
+				if (useRecycleBin)
+					deleted = FileOperationAPIWrapper.MoveToRecycleBin(fileName, false);
+				else
+				{
+					// Borra el archivo
+					File.Delete(fileName);
+					// Indica que se ha borrado correctamente
+					deleted = true;
+				}
+			}
+			catch (Exception exception)
+			{ 
+				// Muestra el mensaje
+				System.Diagnostics.Debug.WriteLine(exception.Message);
+			}
+			// Devuelve el valor que indica si se ha podido borrar
+			return deleted;
 	}
 
 	/// <summary>
 	///		Elimina los archivos de un directorio que se corresponden con la máscara
 	/// </summary>
-	public static void KillFiles(string path, string mask)
+	public static void KillFiles(string path, string mask, bool useRecycleBin)
 	{	
 		foreach (string fileName in Directory.GetFiles(path, mask))
-			KillFile(fileName);
+			KillFile(fileName, useRecycleBin);
 	}
 
 	/// <summary>
@@ -67,7 +75,7 @@ public static class HelperFiles
 	/// <summary>
 	///		Elimina los archivos anteriores a una fecha
 	/// </summary>
-	public static int KillFilesPrevious(string path, DateTime maximumDate)
+	public static int KillFilesPrevious(string path, DateTime maximumDate, bool useRecycleBin)
 	{ 
 		int files = 0;
 
@@ -78,12 +86,12 @@ public static class HelperFiles
 
 					foreach (string fileName in filesList)
 					{ 
-						FileInfo file = new FileInfo(fileName);
+						FileInfo file = new(fileName);
 
 							if (file.CreationTime < maximumDate)
 							{ 
 								// Borra el archivo
-								KillFile(fileName);
+								KillFile(fileName, useRecycleBin);
 								// Indica que se ha borrado uno más
 								files++;
 							}
@@ -113,6 +121,7 @@ public static class HelperFiles
 		// Si ha llegado hasta aquí es porque la unidad no existe
 		return false;
 
+		// Normaliza el nombre de la unidad
 		string NormalizeDrive(string drive)
 		{
 			if (!string.IsNullOrWhiteSpace(drive))
@@ -126,13 +135,13 @@ public static class HelperFiles
 	/// </summary>
 	public static List<string> ListRecursive(string path, string? searchPattern = null)
 	{
-		List<string> files = new List<string>();
+		List<string> files = [];
 
 			// Añade recursivamente los archivos
 			if (Directory.Exists(path))
 			{
 				// Añade los archivos
-				foreach (string fileName in Directory.GetFiles(path, searchPattern))
+				foreach (string fileName in Directory.GetFiles(path, searchPattern ?? string.Empty))
 					files.Add(fileName);
 				// Añade los directorios hijos
 				foreach (string child in Directory.GetDirectories(path))
@@ -198,7 +207,7 @@ public static class HelperFiles
 	/// <summary>
 	///		Elimina un directorio sin tener en cuenta las excepciones
 	/// </summary>
-	public static bool KillPath(string path)
+	public static bool KillPath(string path, bool useRecycleBin)
 	{ 
 		// Si realmente tenemos algo que borrar
 		if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
@@ -206,14 +215,17 @@ public static class HelperFiles
 			// Elimina los archivos
 			foreach (string file in Directory.GetFiles(path))
 				if (File.Exists(file))
-					KillFile(file);
+					KillFile(file, useRecycleBin);
 			// Elimina los directorios
 			foreach (string file in Directory.GetDirectories(path))
-				KillPath(file);
+				KillPath(file, useRecycleBin);
 			// Elimina este directorio
 			try
-			{ 
-				Directory.Delete(path);
+			{
+				if (useRecycleBin)
+					FileOperationAPIWrapper.MoveToRecycleBin(path);
+				else
+					Directory.Delete(path);
 			}
 			catch 
 			{ 
@@ -232,7 +244,7 @@ public static class HelperFiles
 	/// <summary>
 	/// 	Carga un archivo de texto con un encoding determinado en una cadena
 	/// </summary>
-	public static string LoadTextFile(string fileName, System.Text.Encoding encoding) => File.ReadAllText(fileName, encoding);
+	public static string LoadTextFile(string fileName, System.Text.Encoding? encoding) => File.ReadAllText(fileName, encoding ?? System.Text.Encoding.UTF8);
 
 	/// <summary>
 	///		Obtiene la codificación de un archivo
@@ -300,7 +312,7 @@ public static class HelperFiles
 	/// </summary>
 	public static void SaveBinayFile(byte [] source, string fileName)
 	{ 
-		using (FileStream output = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+		using (FileStream output = new(fileName, FileMode.CreateNew, FileAccess.Write, FileShare.None))
 		{ 
 			output.Write(source, 0, source.Length);
 		}
@@ -316,7 +328,7 @@ public static class HelperFiles
 			// Crea el directorio destino
 			MakePath(Path.GetDirectoryName(fileNameTarget)!);
 			// Elimina el archivo antiguo
-			KillFile(fileNameTarget);
+			KillFile(fileNameTarget, false);
 			// Copia el archivo origen en el destino
 			File.Copy(fileNameSource, fileNameTarget);
 			// Indica que se ha copiado correctamente
@@ -338,15 +350,15 @@ public static class HelperFiles
 			// Crea el directorio destino
 			MakePath(Path.GetDirectoryName(fileNameTarget)!);
 			// Elimina el archivo antiguo
-			KillFile(fileNameTarget);
+			KillFile(fileNameTarget, false);
 			// Copia el archivo origen en el destino
-                using (FileStream SourceStream = File.Open(fileNameSource, FileMode.Open))
+            using (FileStream SourceStream = File.Open(fileNameSource, FileMode.Open))
+            {
+                using (FileStream DestinationStream = File.Create(fileNameTarget))
                 {
-                    using (FileStream DestinationStream = File.Create(fileNameTarget))
-                    {
-                        await SourceStream.CopyToAsync(DestinationStream);
-                    }
+                    await SourceStream.CopyToAsync(DestinationStream);
                 }
+            }
 			// Indica que se ha copiado correctamente
 			return true;
 		}
@@ -362,7 +374,7 @@ public static class HelperFiles
 	public static bool MoveFile(string fileNameSource, string fileNameTarget)
 	{ 
 		if (CopyFile(fileNameSource, fileNameTarget))
-			return KillFile(fileNameSource);
+			return KillFile(fileNameSource, false);
 		else
 			return false;
 	}
@@ -373,7 +385,7 @@ public static class HelperFiles
 	public async static Task<bool> MoveFileAsync(string fileNameSource, string fileNameTarget)
 	{ 
 		if (await CopyFileAsync(fileNameSource, fileNameTarget))
-			return KillFile(fileNameSource);
+			return KillFile(fileNameSource, false);
 		else
 			return false;
 	}
@@ -391,7 +403,7 @@ public static class HelperFiles
 				MakePath(pathTarget);
 				// Copia el directorio origen en el destino y elimina el original si se ha copiado
 				if (CopyPath(pathSource, pathTarget))
-					KillPath(pathSource);
+					KillPath(pathSource, false);
 				// Indica que se ha movido correctamente
 				return true;
 			}
@@ -403,21 +415,21 @@ public static class HelperFiles
 	/// <summary>
 	///		Compara dos directorios y elimina los archivos iguales
 	/// </summary>
-	private static void KillComparePath(string pathSource, string pathTarget)
+	private static void KillComparePath(string pathSource, string pathTarget, bool useRecycleBin)
 	{ 
 		if (Directory.Exists(pathTarget))
 		{ 
 			// Borra los archivos que existen en los dos directorios
 			foreach (string file in Directory.GetFiles(pathSource))
 				if (File.Exists(Path.Combine(pathTarget, Path.GetFileName(file))))
-					KillFile(file);
+					KillFile(file, useRecycleBin);
 			// Compara subdirectorios
 			foreach (string path in Directory.GetDirectories(pathSource))
-				KillComparePath(path, Path.Combine(pathTarget, Path.GetFileName(path)));
+				KillComparePath(path, Path.Combine(pathTarget, Path.GetFileName(path)), useRecycleBin);
 			// Borra los subdirectorios vacíos
 			foreach (string path in Directory.GetDirectories(pathSource))
 				if (CheckIsEmptyPath(path))
-					KillPath(path);
+					KillPath(path, useRecycleBin);
 		}
 	}
 
@@ -519,21 +531,22 @@ public static class HelperFiles
 	/// </summary>
 	public static string GetConsecutiveFileName(string path, string fileName)
 	{ 
-		string newFile = Path.GetFileName(fileName);
-		string extension = NormalizeExtension(Path.GetExtension(fileName));
-		SortedDictionary<string, string> dctFiles = GetDictionaryFilesName(path, Path.GetFileNameWithoutExtension(newFile) + "*" + extension);
+		string fileNameWithoutExtension = GetTotalFileName(fileName);
+		string extension = NormalizeExtension(GetTotalExtension(fileName));
+		string consecutiveFile = fileNameWithoutExtension + extension;
+		SortedDictionary<string, string> dctFiles = GetDictionaryFilesName(path, fileNameWithoutExtension + "*" + extension);
 		int index = 1;
 	
-			// Si existe el archivo destino, lo cambia
-			while (ExistsFile(dctFiles, newFile))
+			// Si existe el archivo destino, cambia el nombre de archivo para añadir un índice
+			while (ExistsFile(dctFiles, consecutiveFile))
 			{ 
 				// Obtiene el nombre nuevo
-				newFile = Path.GetFileNameWithoutExtension(Path.GetFileName(fileName)) + $"_{index}{extension}";
+				consecutiveFile = fileNameWithoutExtension + $"_{index}{extension}";
 				// Incrementa el índice
 				index++;
 			}
 			// Devuelve el nombre destino
-			return Path.Combine(path, newFile);
+			return Path.Combine(path, consecutiveFile);
 	}
 
 	/// <summary>
@@ -577,6 +590,53 @@ public static class HelperFiles
 	}
 	
 	/// <summary>
+	///		Obtiene el nombre completo de un archivo sin ninguna extensión. 
+	///		Si el archivo tiene varias extensiones (.xml.json) quita ambas, es decir "file.xml.json" debe
+	///		retornar "file"
+	/// </summary>
+	public static string GetTotalFileName(string fileName)
+	{
+		string? file = Path.GetFileName(fileName);
+
+			// Obtiene la extensión
+			if (!string.IsNullOrWhiteSpace(file))
+			{
+				string extension = GetTotalExtension(fileName);
+
+					if (!string.IsNullOrWhiteSpace(extension))
+					{
+						if (file.Length == extension.Length + 1)
+							file = string.Empty;
+						else
+							file = file[..(file.Length - extension.Length - 1)];
+					}
+			}
+			// Devuelve el nombre de archivo
+			return file;
+	}
+	
+	/// <summary>
+	///		Obtiene la extensión de un archivo. Si el archivo tiene dos extensiones (.xml.json), 
+	///		obtiene las dos extensiones. Devuelve la extensión sin el punto
+	/// </summary>
+	public static string GetTotalExtension(string fileName)
+	{
+		string? file = Path.GetFileName(fileName);
+		string extension = string.Empty;
+
+			// Obtiene la extensión
+			if (!string.IsNullOrWhiteSpace(file))
+			{
+				int indexOfPoint = file.IndexOf(".");
+
+					if (indexOfPoint >= 0)
+						extension = file[(indexOfPoint + 1)..];
+			}
+			// Devuelve la extensión
+			return extension;
+	}
+
+	/// <summary>
 	///		Obtiene un nombre de archivo a partir de un índice
 	/// </summary>
 	private static string GetNextFileName(int index, string extension) => $"{index:0000000}{extension}";
@@ -586,7 +646,7 @@ public static class HelperFiles
 	/// </summary>
 	private static SortedDictionary<string, string> GetDictionaryFilesName(string path, string mask)
 	{ 
-		SortedDictionary<string, string> filesSorted = new SortedDictionary<string, string>();
+		SortedDictionary<string, string> filesSorted = [];
 
 			// Comprueba que exista el directorio
 			if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
@@ -688,10 +748,10 @@ public static class HelperFiles
 				target = target.TrimIgnoreNull();
 				// Quita los puntos iniciales
 				while (target.Length > 0 && target[0] == '.')
-					target = target.Substring(1);
+					target = target[1..];
 				// Obtiene los n primeros caracteres del nombre de archivo
 				if (length > 0 && target.Length > length)
-					target = target.Substring(0, length);
+					target = target[..length];
 			}
 			// Devuelve la cadena de salida
 			return target;
@@ -700,7 +760,7 @@ public static class HelperFiles
 	/// <summary>
 	///		Elimina los directorios vacíos
 	/// </summary>
-	public static void KillEmptyPaths(string path)
+	public static void KillEmptyPaths(string path, bool useRecycleBin)
 	{ 
 		if (Directory.Exists(path))
 		{
@@ -708,10 +768,10 @@ public static class HelperFiles
 
 				// Borra los directorios hijo
 				foreach (string child in childs)
-					KillEmptyPaths(child);
+					KillEmptyPaths(child, useRecycleBin);
 				// Si no tiene directorios ni archivos, borra este directorio
 				if (Directory.GetFiles(path).Length == 0 &&  Directory.GetDirectories(path).Length == 0)
-					KillPath(path);
+					KillPath(path, useRecycleBin);
 		}
 	}
 
@@ -847,8 +907,8 @@ public static class HelperFiles
 
 			// Quita los directorios iniciales que sean iguales
 			while (index < partsPathTarget.Length &&
-					index < partsPathSource.Length &&
-					partsPathTarget[index].Equals(partsPathSource[index], StringComparison.CurrentCultureIgnoreCase))
+				   index < partsPathSource.Length &&
+				   partsPathTarget[index].Equals(partsPathSource[index], StringComparison.CurrentCultureIgnoreCase))
 				index++;
 			// Añade todos los .. que sean necesarios
 			indexTarget = index;
