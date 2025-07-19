@@ -65,7 +65,6 @@ public class FileModel_Should
 			file2.Combine(fileName).FileName.ShouldBe(result);
 	}
 
-
 	/// <summary>
 	///		Comprueba que se cree correctamente un nombre archivo combinado
 	/// </summary>
