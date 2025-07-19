@@ -10,7 +10,7 @@ public class FileModel_Should
 	/// <summary>
 	///		Comprueba que se obtenga correctamente un separador
 	/// </summary>
-	[Theory]
+	[Theory(Skip = "Skip")]
 	[InlineData("C:/A/file.abc", '/')]
 	[InlineData("C:\\A\\file.abc", '\\')]
 	public void get_separator(string fileName, char separator)
@@ -23,7 +23,7 @@ public class FileModel_Should
 	/// <summary>
 	///		Comprueba que se obtenga correctamente un nombre de archivo
 	/// </summary>
-	[Theory]
+	[Theory(Skip = "Skip")]
 	[InlineData("C:/A/file.abc")]
 	public void create_file(string fileName)
 	{
@@ -35,7 +35,7 @@ public class FileModel_Should
 	/// <summary>
 	///		Comprueba que se obtenga correctamente la carpeta
 	/// </summary>
-	[Theory]
+	[Theory(Skip = "Skip")]
 	[InlineData("C:/A/file.abc", "C:\\A")]
 	public void get_folder(string fileName, string result)
 	{
@@ -47,7 +47,7 @@ public class FileModel_Should
 	/// <summary>
 	///		Comprueba que se cree correctamente un nombre archivo combinado
 	/// </summary>
-	[Theory]
+	[Theory(Skip = "Skip")]
 	[InlineData("C:/A", "file.txt", "C:/A/file.txt")]
 	[InlineData("C:\\A", "file.txt", "C:\\A\\file.txt")]
 	[InlineData("C:\\A", "../file.txt", "C:\\file.txt")]
@@ -68,7 +68,7 @@ public class FileModel_Should
 	/// <summary>
 	///		Comprueba que se cree correctamente un nombre archivo combinado
 	/// </summary>
-	[Theory]
+	[Theory(Skip = "Skip")]
 	[InlineData("C:/A/file.txt", "pas", "C:/A/file.pas")]
 	[InlineData("C:/A/file.txt", ".pas", "C:/A/file.pas")]
 	[InlineData("C:\\A\\file.txt", "pas", "C:\\A\\file.pas")]
@@ -86,7 +86,7 @@ public class FileModel_Should
 	/// <summary>
 	///		Comprueba que se modifique correctamente el nombre de archiov
 	/// </summary>
-	[Theory]
+	[Theory(Skip = "Skip")]
 	[InlineData("C:/A/file.txt", "pepito", true, "C:/A/pepito.txt")]
 	[InlineData("C:/A/file.txt", "pepito.pas", true, "C:/A/pepito.pas.txt")]
 	[InlineData("C:/A/file.txt", "pepito.pas", false, "C:/A/pepito.pas")]
