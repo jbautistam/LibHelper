@@ -17,7 +17,7 @@ public static class StringExtensor
 		else if (string.IsNullOrEmpty(first) && string.IsNullOrEmpty(second))
 			return true;
 		else
-			return first.Equals(second, StringComparison.CurrentCultureIgnoreCase);
+			return first!.Equals(second, StringComparison.CurrentCultureIgnoreCase);
 	}
 
 	/// <summary>
@@ -32,7 +32,7 @@ public static class StringExtensor
 		else if (string.IsNullOrEmpty(first) && string.IsNullOrEmpty(second))
 			return true;
 		else
-			return first.Equals(second, StringComparison.CurrentCultureIgnoreCase);
+			return first!.Equals(second, StringComparison.CurrentCultureIgnoreCase);
 	}
 
 	/// <summary>
@@ -47,7 +47,7 @@ public static class StringExtensor
 		else if (!string.IsNullOrEmpty(first) && string.IsNullOrEmpty(second))
 			return 1;
 		else
-			return first.CompareTo(second);
+			return first!.CompareTo(second);
 	}
 
 	/// <summary>
@@ -367,7 +367,8 @@ public static class StringExtensor
 	/// <summary>
 	///		Reemplaza una cadena teniendo en cuenta el tipo de comparación
 	/// </summary>
-	public static string ReplaceWithStringComparison(this string source, string search, string replace, StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
+	public static string ReplaceWithStringComparison(this string source, string search, string replace, 
+													 StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
 	{
 		// Recorre la cadena sustituyendo los valores
 		if (!source.IsEmpty() && !search.EqualsIgnoreCase(replace))

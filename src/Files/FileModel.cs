@@ -5,9 +5,18 @@
 /// </summary>
 public class FileModel
 {
-	public FileModel(string fileName)
+	// Variables privadas
+	private string _fileName = default!;
+	private char _separator = '\\';
+
+	public FileModel(string folder, string? file = null)
 	{
-		FileName = fileName;
+		if (!string.IsNullOrWhiteSpace(folder))
+		{
+			if (folder.Contains('/'))
+				Separator = '/';
+		}
+		FileName = Combine(folder, file);
 	}
 
 	/// <summary>
@@ -49,39 +58,38 @@ public class FileModel
 	/// <summary>
 	///		Combina con un nombre de archivo
 	/// </summary>
-	public FileModel Combine(string path)
+	public FileModel Combine(string file) => new(FileName, file);
+
+	/// <summary>
+	///		Combina con un nombre de archivo
+	/// </summary>
+	private string Combine(string folder, string? file)
 	{
-		if (IsEmpty())
-			return new FileModel(path);
-		else if (string.IsNullOrEmpty(path))
-			return new FileModel(FileName);
+		if (string.IsNullOrWhiteSpace(file))
+			return folder;
+		else if (string.IsNullOrWhiteSpace(folder))
+			return file;
 		else
-			return new FileModel(Path.Combine(FileName, path));
-	}
+		{
+			string? actualPath = folder;
 
-	/// <summary>
-	///		Modifica el separador
-	/// </summary>
-	public void UpdateSeparator(char oldSeparator, char newSeparator)
-	{
-		if (!IsEmpty())
-			FileName.Replace(oldSeparator, newSeparator);
-	}
-
-	/// <summary>
-	///		Modifica el separador para Windows
-	/// </summary>
-	public void UpdateSeparatorWindows()
-	{
-		UpdateSeparator('/', '\\');
-	}
-
-	/// <summary>
-	///		Modifica el separador para Unix
-	/// </summary>
-	public void UpdateSeparatorUnix()
-	{
-		UpdateSeparator('\\', '/');
+				// Normaliza el archivo
+				file = file.Replace('/', '\\');
+				// Quita los directorios ..\
+				while (!string.IsNullOrWhiteSpace(file) && file.StartsWith("..\\"))
+				{
+					// Quita el directorio final
+					if (!string.IsNullOrWhiteSpace(actualPath))
+						actualPath = Path.GetDirectoryName(actualPath);
+					// Quita el comienzo de la cadena
+					file = file[3..];
+				}
+				// Devuelve la combinación de archivos
+				if (string.IsNullOrWhiteSpace(actualPath))
+					return file;
+				else
+					return Path.Combine(actualPath, file);
+		}
 	}
 
 	/// <summary>
@@ -100,7 +108,7 @@ public class FileModel
 				if (!extension.StartsWith('.'))
 					extension = '.' + extension;
 				// Cambia la extensión
-				FileName = GetFileNameWithoutExtension() + extension;
+				FileName = Path.Combine(Path.GetDirectoryName(FileName)!, GetFileNameWithoutExtension() + extension);
 			}
 		}
 	}
@@ -113,9 +121,9 @@ public class FileModel
 		if (!IsEmpty())
 		{
 			if (preserveExtension)
-				FileName = GetFileNameWithoutExtension() + '\\' + newName + GetExtension();
+				FileName = Combine(GetDirectory()!, newName + GetExtension());
 			else
-				FileName = GetFileNameWithoutExtension() + '\\' + newName;
+				FileName = Combine(GetDirectory()!, newName);
 		}
 	}
 	
@@ -175,5 +183,26 @@ public class FileModel
 	/// <summary>
 	///		Nombre de archivo
 	/// </summary>
-	public string FileName { get; private set; }
+	public string FileName 
+	{ 
+		get
+		{
+			if (string.IsNullOrWhiteSpace(_fileName))
+				return string.Empty;
+			else if (Separator == '/')
+				return _fileName.Replace('\\', '/');
+			else
+				return _fileName.Replace('/', '\\');
+		}
+		private set { _fileName = value; }
+	}
+
+	/// <summary>
+	///		Separador
+	/// </summary>
+	public char Separator 
+	{ 
+		get { return _separator; }
+		set { _separator = value; }
+	}
 }

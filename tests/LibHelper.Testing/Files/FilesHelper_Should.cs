@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Bau.Libraries.LibHelper.Files;
+﻿using Bau.Libraries.LibHelper.Files;
 
 namespace LibHelper.Testing.Files;
 
@@ -24,7 +23,7 @@ public class FilesHelper_Should
 	[InlineData(".file", "file")]
 	public void get_total_extension(string fileName, string result)
 	{
-		HelperFiles.GetTotalExtension(fileName).Should().Be(result);
+		HelperFiles.GetTotalExtension(fileName).ShouldBe(result);
 	}
 
 	/// <summary>
@@ -43,6 +42,6 @@ public class FilesHelper_Should
 	[InlineData(".file", "")]
 	public void get_total_file(string fileName, string result)
 	{
-		HelperFiles.GetTotalFileName(fileName).Should().Be(result);
+		HelperFiles.GetTotalFileName(fileName).ShouldBe(result);
 	}
 }
